@@ -6,18 +6,14 @@ using namespace std;
 struct node {
 	bool isword;
 	bool issuffix;
-	char c;
 	unordered_map <char, node*> map;
 
 	node() { isword = issuffix = false; }
 
 	void insert(string word, int i, bool isword) {
 		if (i < word.length()) {
-			for (int j = word.length() - 1; j >= i; j--) {
-				if (!map.count(word[j])) map.insert(pair<char, node*>(word[j], new node()));
-				if (j == i) map[word[j]]->insert(word, j+1, isword);
-				else map[word[j]]->insert(word, j+1, false);
-			}
+			if (!map.count(word[i])) map.insert(pair<char, node*>(word[i], new node()));
+			map[word[i]]->insert(word, i+1, isword);
 			if (i == word.length() - 1) {
 				issuffix  = true;
 				this->isword |= isword;
@@ -39,7 +35,18 @@ struct suffixtrie {
 
 	~suffixtrie() { delete root; }
 
-	void insert(string word) { root->insert(word, 0, true); }
+	void insert(string word) { 
+		for (int j = word.length() - 1; j >= 0; j--) {
+			if (j == 0) root->insert(word, j, true);
+			else root->insert(word, j, false);
+		}
+	}
 
 	int search(string word) { return root->search(word, 0); }
+
+	void clear() { delete root; root = new node(); }
 };
+
+int main() {
+	return 0;
+}
