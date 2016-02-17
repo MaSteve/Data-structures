@@ -4,6 +4,9 @@
 #include <utility>
 using namespace std;
 
+int size = 4;
+char characters[4] = {'A', 'C', 'G', 'T'};//It could be replaced by an unordered_map
+
 struct node {
 	string pattern;
 	bool isword;
@@ -13,11 +16,12 @@ struct node {
 
 	node() { isword = issuffix = false; pattern = ""; nodes = 0; }
 
-	node(string pattern, bool isword, bool issuffix, unordered_map<char, node*> & map) {
+	node(string pattern, bool isword, bool issuffix, unordered_map<char, node*> & map, int nodes) {
 		this->pattern = pattern;
 		this->isword = isword;
 		this->issuffix = issuffix;
 		this->map = map;
+		this->nodes = nodes;
 	}
 
 	void insert(string word, int i, bool isword) {
@@ -34,7 +38,7 @@ struct node {
 				} else {
 					unordered_map <char, node*> aux = map;
 					map = unordered_map <char, node*>();
-					map.insert(pair<char, node*>(pattern[j], new node(pattern.substr(j, pattern.length()-j), this->isword, issuffix, aux)));
+					map.insert(pair<char, node*>(pattern[j], new node(pattern.substr(j, pattern.length()-j), this->isword, issuffix, aux, nodes)));
 					pattern = pattern.substr(0, j);
 					issuffix = false;
 					this->isword = false;
@@ -49,21 +53,17 @@ struct node {
 			if (i >= word.length() || nodes == 0) {
 				issuffix  = true;
 				this->isword |= isword;
-				nodes++;
 			}
+			nodes++;
 		}
 	}
 	
 	int search(string word, int i) {
-		cout << "t:"<< i << endl;
 		int j;
 		for (j = 0; i < word.length() && j < pattern.length() && word[i] == pattern[j]; i++, j++);
-		cout << i << " " << j << endl;
 		if (j == pattern.length()) {
-			cout << "mat" << endl;
 			if (i == word.length()) return isword? 2: issuffix? 1: 0;
 			else {
-				cout << "rec" << endl;
 				if (i >= word.length() || !map.count(word[i])) return 0;
 				return map[word[i]]->search(word, i);
 			}
@@ -73,6 +73,22 @@ struct node {
 	void print(int i){
 		cout << i << "p:" << pattern << endl;
 		for (auto it = map.begin(); it != map.end(); ++it) it->second->print(i+1);
+	}
+
+	pair<string, int> lrs() {
+		pair<string, int> res = pair<string, int>("", 0);
+		if (map.empty()) return res;
+		for (int i = 0; i < size; i++) {
+			if (map.count(characters[i])) {
+				pair<string, int> t = map[characters[i]]->lrs();
+				if (pattern.length() + t.first.length() > res.first.length()) {
+					res = t;
+					res.first = pattern + res.first;
+					if (res.second == 0) res.second = nodes;
+				}
+			}
+		}
+		return res;
 	}
 };
 
@@ -95,6 +111,10 @@ struct suffixtree {
 	void clear() { delete root; root = new node(); }
 
 	void print() { root->print(0); }
+
+	pair<string, int> lrs() {
+		return root->lrs();
+	}
 };
 
 int main() {
