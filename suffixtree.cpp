@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -33,7 +34,7 @@ struct node {
 				} else {
 					unordered_map <char, node*> aux = map;
 					map = unordered_map <char, node*>();
-					map.insert(pair<char, node*>(pattern[j], new node(pattern.substr(j, pattern.length()-j), isword, issuffix, aux)));
+					map.insert(pair<char, node*>(pattern[j], new node(pattern.substr(j, pattern.length()-j), this->isword, issuffix, aux)));
 					pattern = pattern.substr(0, j);
 					issuffix = false;
 					this->isword = false;
@@ -45,7 +46,7 @@ struct node {
 				//if (!map.count(word[i])) map.insert(pair<char, node*>(word[i], new node(, isword, issuffix, map)));
 				//else map[word[i]]->insert(word, i+1, isword);
 			}
-			if (i >= word.length() - 1 || nodes == 0) {
+			if (i >= word.length() || nodes == 0) {
 				issuffix  = true;
 				this->isword |= isword;
 				nodes++;
@@ -54,24 +55,33 @@ struct node {
 	}
 	
 	int search(string word, int i) {
+		cout << "t:"<< i << endl;
 		int j;
 		for (j = 0; i < word.length() && j < pattern.length() && word[i] == pattern[j]; i++, j++);
-		if (j == pattern.length() - 1) {
-			if (i == word.length() - 1) return isword? 2: issuffix? 1: 0;
+		cout << i << " " << j << endl;
+		if (j == pattern.length()) {
+			cout << "mat" << endl;
+			if (i == word.length()) return isword? 2: issuffix? 1: 0;
 			else {
+				cout << "rec" << endl;
 				if (i >= word.length() || !map.count(word[i])) return 0;
 				return map[word[i]]->search(word, i);
 			}
 		} else return 0;
 	}
+
+	void print(int i){
+		cout << i << "p:" << pattern << endl;
+		for (auto it = map.begin(); it != map.end(); ++it) it->second->print(i+1);
+	}
 };
 
-struct suffixtrie {
+struct suffixtree {
 	node* root;
 
-	suffixtrie() { root = new node(); }
+	suffixtree() { root = new node(); }
 
-	~suffixtrie() { delete root; }
+	~suffixtree() { delete root; }
 
 	void insert(string word) {
 		for (int j = word.length() - 1; j >= 0; j--) {
@@ -83,8 +93,19 @@ struct suffixtrie {
 	int search(string word) { return root->search(word, 0); }
 
 	void clear() { delete root; root = new node(); }
+
+	void print() { root->print(0); }
 };
 
 int main() {
+	suffixtree tree;
+	string word;
+	cin >> word;
+	tree.insert(word);
+	tree.print();
+	while (true) {
+		cin >> word;
+		cout << tree.search(word) << endl;
+	}
 	return 0;
 }
