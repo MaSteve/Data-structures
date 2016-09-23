@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <assert.h>
 using namespace std;
 
 typedef vector<int> vi;
@@ -48,9 +49,9 @@ struct Fenwick {
                 //limit2--;
                 diff = -diff;
                 k++;
-                for (;k < limit2 && ft[k] < diff; k += LSOne(k)) prev = k; //, printf("L2 %d %d\n", k, ft[k]);
+                for (;k < limit2 && ft[k] < diff; k += LSOne(k)) prev = k;//, printf("L2 %d %d\n", k, ft[k]);
                 //printf("P2 %d %d\n", k, prev);
-                if (k < limit2) return k;
+                //if (k < limit2) return k;
                 //if (ft[k] >= diff) return limit1 + 1;
                 i++;
             }
@@ -70,27 +71,20 @@ struct Fenwick {
 };
 
 int main() {
-    int f[] = { 2,4,5,5,6,6,6,7,7,8,9 };
-    Fenwick fen(10);
-    for (int i = 0; i < 11; i++) fen.insertDiff(f[i], 1);
-    printf("%d\n", fen.rsq(1, 1));
+    int f[] = { 1,1,1,1,1,3,4,5,6,7,7,7,7,8,9,9,10,11,12 };
+    int N = 19;
+    Fenwick fen(13);
+    for (int i = 0; i < N; i++) fen.insertDiff(f[i], 1);
+    /*printf("%d\n", fen.rsq(1, 1));
     printf("%d\n", fen.rsq(1, 2));
     printf("%d\n", fen.rsq(1, 6));
     printf("%d\n", fen.rsq(1, 10));
     printf("%d\n", fen.rsq(3, 6));
-    printf("---------\n");
-    printf("0 %d\n", fen.sicf(0));
-    printf("1 %d\n", fen.sicf(1));
-    printf("2 %d\n", fen.sicf(2));
-    printf("3 %d\n", fen.sicf(3));
-    printf("4 %d\n", fen.sicf(4));
-    printf("5 %d\n", fen.sicf(5));
-    printf("6 %d\n", fen.sicf(6));
-    printf("7 %d\n", fen.sicf(7));
-    printf("8 %d\n", fen.sicf(8));
-    printf("9 %d\n", fen.sicf(9));
-    printf("10 %d\n", fen.sicf(10));
-    printf("11 %d\n", fen.sicf(11));
-    printf("12 %d\n", fen.sicf(12));
+    printf("---------\n");*/
+    for (int i = 1; i < N + 4; i++) {
+        printf("%d %d\n", i, fen.sicf(i));
+        assert(i <= N? fen.sicf(i) == f[i - 1]: fen.sicf(i) == -1);
+    }
+    //int i = 18; printf("%d %d\n", i, fen.sicf(i));
     return 0;
 }
