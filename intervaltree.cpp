@@ -46,6 +46,19 @@ struct node {
             right->insert(l, u);
         }
     }
+    void intersect(int l, int u) {
+        //printf("In: %d %d %d %d: %d\n", low, l, u, up, center);
+        if (l <= center && center <= u && !empty) {
+            mini = max(mini, l);
+            maxi = min(maxi, u);
+        }
+        if (l < center) {
+            if (left != NULL) left->intersect(l, u);
+        }
+        if (u > center) {
+            if (right != NULL) right->intersect(l, u);
+        }
+    }
     bool intersection(int p) {
         //printf("Q: %d %d: %d\n", low, up, p);
         //if (p > up || p < low) return false;
@@ -63,6 +76,7 @@ struct intervaltree {
 	intervaltree(int low, int up) { root = new node(low, up); }
 	~intervaltree() { delete root; }
     void insert(int l, int u) { root->insert(l, u); }
+    void intersect(int l, int u) { root->intersect(l, u); }
     bool intersection(int p) { return root->intersection(p); }
 };
 
